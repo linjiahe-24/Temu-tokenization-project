@@ -1,3 +1,4 @@
+```mermaid
 flowchart TD
     Start([Start & Common Steps]) --> AddProducts[Add products to the shopping cart]
     AddProducts --> Checkout[Proceed to checkout]
@@ -28,3 +29,4 @@ flowchart TD
     Remember -- No --> OneTime[Standard one-time payment flow]
     OneTime --> ConfirmPay3[Confirm to pay on Klarna checkout page]
     ConfirmPay3 --> PaySuccess5[Payment succeeds]
+```
