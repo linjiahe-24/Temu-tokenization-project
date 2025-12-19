@@ -1,57 +1,32 @@
 # Temu-tokenization-project
 
+flowchart TD
+    Start([Start & Common Steps]) --> AddProducts[Add products to the shopping cart]
+    AddProducts --> Checkout[Proceed to checkout]
+    Checkout --> Shipping[Fill out shipping address form]
+    Shipping --> Tokenized{Tokenized customer?}
 
-```mermaid
-sequenceDiagram
-    participant User
-    participant Merchant
-    participant Klarna
+    %% Branch A: Tokenized Customer
+    Tokenized -- Yes --> DisplayOptionsA[Display two payment options]
+    DisplayOptionsA --> SavedPayment[Option A1 — Use saved payment]
+    SavedPayment --> TokenCharge{Token charge succeeds?}
+    TokenCharge -- Yes --> PaySuccess1[Pay with token succeeds\nPayment succeeds]
+    TokenCharge -- No --> StepUp[Tigger step-up flow]
+    StepUp --> Reauthorize[Handle fail reason & re-authorize payment on Klarna checkout]
+    Reauthorize --> PaySuccess2[Payment succeeds]
 
-    User->>Merchant: Add products to cart
-    User->>Merchant: Proceed to checkout
-    User->>Merchant: Fill shipping address
+    DisplayOptionsA --> ChangePayment[Option A2 — Change payment option]
+    ChangePayment --> ChooseNew[Choose different payment option on Klarna checkout]
+    ChooseNew --> ConfirmPay1[Confirm to pay]
+    ConfirmPay1 --> PaySuccess3[Payment succeeds]
 
-    Merchant->>Merchant: Is tokenized customer?
+    %% Branch B: Not Tokenized Customer
+    Tokenized -- No --> DisplayOptionB[Display single payment option: Pay with Klarna]
+    DisplayOptionB --> Remember{Remember Klarna?}
+    Remember -- Yes --> TokenCreation[Go to token creation flow]
+    TokenCreation --> ConfirmPay2[Confirm to pay & authorize token creation on Klarna checkout]
+    ConfirmPay2 --> PaySuccess4[Payment succeeds & token is created]
 
-    alt Tokenized customer = Yes
-        Merchant->>User: Display two payment options
-
-        alt Choose saved payment option
-            User->>Merchant: Select saved payment
-            Merchant->>Klarna: Charge with token
-
-            alt Token charge succeeds
-                Klarna-->>Merchant: Charge success
-                Merchant-->>User: Payment succeeds
-            else Token charge fails
-                Klarna-->>Merchant: Charge failed
-                Merchant->>Klarna: Trigger step-up flow
-                Klarna-->>Merchant: Re-authorization success
-                Merchant-->>User: Payment succeeds
-            end
-
-        else Choose change payment option
-            User->>Merchant: Change payment option
-            Merchant->>Klarna: Redirect to Klarna checkout
-            User->>Klarna: Select different payment option
-            User->>Klarna: Confirm to pay
-            Klarna-->>Merchant: Payment authorized
-            Merchant-->>User: Payment succeeds
-        end
-
-    else Tokenized customer = No
-        Merchant->>User: Display single option: Pay with Klarna
-        Merchant->>Merchant: Remember Klarna?
-
-        alt Remember Klarna = Yes
-            Merchant->>Klarna: Start token creation flow
-            User->>Klarna: Confirm payment and token creation
-            Klarna-->>Merchant: Payment success + token created
-            Merchant-->>User: Payment succeeds
-        else Remember Klarna = No
-            Merchant->>Klarna: Start one-time payment flow
-            User->>Klarna: Confirm payment
-            Klarna-->>Merchant: Payment authorized
-            Merchant-->>User: Payment succeeds
-        end
-    end
+    Remember -- No --> OneTime[Go to standard one-time payment flow]
+    OneTime --> ConfirmPay3[Confirm to pay on Klarna checkout page]
+    ConfirmPay3 --> PaySuccess5[Payment succeeds]
