@@ -1,5 +1,3 @@
-# Temu-tokenization-project
-
 flowchart TD
     Start([Start & Common Steps]) --> AddProducts[Add products to the shopping cart]
     AddProducts --> Checkout[Proceed to checkout]
@@ -8,14 +6,14 @@ flowchart TD
 
     %% Branch A: Tokenized Customer
     Tokenized -- Yes --> DisplayOptionsA[Display two payment options]
-    DisplayOptionsA --> SavedPayment[Option A1 — Use saved payment]
+    DisplayOptionsA --> SavedPayment[Use saved payment]
     SavedPayment --> TokenCharge{Token charge succeeds?}
-    TokenCharge -- Yes --> PaySuccess1[Pay with token succeeds\nPayment succeeds]
-    TokenCharge -- No --> StepUp[Tigger step-up flow]
+    TokenCharge -- Yes --> PaySuccess1[Pay with token succeeds<br>Payment succeeds]
+    TokenCharge -- No --> StepUp[Trigger step-up flow]
     StepUp --> Reauthorize[Handle fail reason & re-authorize payment on Klarna checkout]
     Reauthorize --> PaySuccess2[Payment succeeds]
 
-    DisplayOptionsA --> ChangePayment[Option A2 — Change payment option]
+    DisplayOptionsA --> ChangePayment[Change payment option]
     ChangePayment --> ChooseNew[Choose different payment option on Klarna checkout]
     ChooseNew --> ConfirmPay1[Confirm to pay]
     ConfirmPay1 --> PaySuccess3[Payment succeeds]
@@ -27,6 +25,6 @@ flowchart TD
     TokenCreation --> ConfirmPay2[Confirm to pay & authorize token creation on Klarna checkout]
     ConfirmPay2 --> PaySuccess4[Payment succeeds & token is created]
 
-    Remember -- No --> OneTime[Go to standard one-time payment flow]
+    Remember -- No --> OneTime[Standard one-time payment flow]
     OneTime --> ConfirmPay3[Confirm to pay on Klarna checkout page]
     ConfirmPay3 --> PaySuccess5[Payment succeeds]
